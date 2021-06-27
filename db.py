@@ -1,6 +1,8 @@
-
+import pendulum
 from sqlalchemy import create_engine, Column, Integer, Float, ForeignKey, String
 from sqlalchemy.orm import Session, declarative_base, relationship
+
+from alehcmy_pendulum import PendulumType
 
 engine = create_engine('sqlite:///:memory:')
 Base = declarative_base()
@@ -18,6 +20,7 @@ class User(Base):
 class Game(Base):
     __tablename__ = 'game'
     id = Column(Integer, primary_key=True)
+    reported_at = Column(PendulumType, default=pendulum.now())
     reported_by_id = Column(Integer, ForeignKey(User.id), nullable=False)
     winner_1_id = Column(Integer, ForeignKey(User.id), nullable=False)
     winner_2_id = Column(Integer, ForeignKey(User.id))
@@ -53,6 +56,7 @@ class Game(Base):
         report += ' defeats '
         report += ', '.join(losers_tokens[:-1])
         report += ', and ' + losers_tokens[-1]
+        report += f' on {self.reported_at.format("dddd, DD MMMM YYYY")}.'
         return report
 
 
